@@ -19,16 +19,16 @@ PUBLISH __sentinel__:hello "{{s_ip}},{{s_port}},{{s_runid}},{{s_epoch}},{{m_name
 ```
 
 #### sentinel 监管 redis 状态
-Sentinel 本地缓存着所有 redis 的配置（缓存的配置不一定与当前所有 redis 实例的状态一致)    
+sentinel 本地缓存着所有 redis 的配置（缓存的配置不一定与当前所有 redis 实例的状态一致)    
   
-即使没有自动故障迁移操作在进行， Sentinel 总会尝试将当前的配置设置到被监视的 redis 实例上面。
+即使没有自动故障迁移操作在进行， sentinel 总会尝试将当前的配置设置到被监视的 redis 实例上面。
 
 以 Demo1 举例：
 1. sentinel **认为** redisB 是 slave, 如果因为某种原因 redisB 变成 master, sentinel 会向 redisB 发送 `slaveof {{m_ip}} {{m_port}}`, 让 redisB 变回 slave.  
 2. sentinel **认为** redisB 是 redisA 的 slave, 如果因为某种原因 redisB 不是 redisA 的 slave, sentinel 会让 redisB 变回 redisA 的 slave (向 redisB 发送 `slaveof {{m_ip}} {{m_port}}`).  
 3. sentinel **认为** redisA 是 master, 如果因为某种原因 redisA 变成 slave, sentinel 会认为 redisA 发生故障了，以 failover 的方式重新选择 master.
 
-不过，Sentinel 在对实例进行重新配置之前仍然会等待一段足够长的时间，确保可以接收到其他 Sentinel 发来的配置更新，从而避免自身因为保存了过期的配置而对实例进行了不必要的重新配置。
+不过，sentinel 在对实例进行重新配置之前仍然会等待一段足够长的时间，确保可以接收到其他 sentinel 发来的配置更新，从而避免自身因为保存了过期的配置而对实例进行了不必要的重新配置。
 
 ### 解答 
 > 只考虑 leader 挂了后仍有三台以上 sentinel 在正常工作的情况，且不考虑其他意外事故
